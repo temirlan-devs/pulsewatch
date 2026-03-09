@@ -28,6 +28,10 @@ public class LogIngestionController {
     @GetMapping
     public Page<LogEntry> getLogs(@RequestParam(required = false) String service, Pageable pageable) {
         
+        if(pageable.getPageSize() > 100) {
+            pageable = Pageable.ofSize(100).withPage(pageable.getPageNumber());
+        }
+
         if (service != null && !service.isBlank()) {
             return logEntryService.getLogsByService(service, pageable);
         }
