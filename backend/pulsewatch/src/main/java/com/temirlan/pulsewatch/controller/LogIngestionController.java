@@ -28,7 +28,7 @@ public class LogIngestionController {
     @GetMapping
     public Page<LogEntry> getLogs(@RequestParam(required = false) String service, Pageable pageable) {
         
-        if (service != null) {
+        if (service != null && !service.isBlank()) {
             return logEntryService.getLogsByService(service, pageable);
         }
         
