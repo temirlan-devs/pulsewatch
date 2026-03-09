@@ -1,6 +1,5 @@
 package com.temirlan.pulsewatch.controller;
 
-import com.temirlan.pulsewatch.model.LogEntry;
 import com.temirlan.pulsewatch.service.LogEntryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

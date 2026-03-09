@@ -1,33 +1,23 @@
-package com.temirlan.pulsewatch.model;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+package com.temirlan.pulsewatch.dto;
 
 import com.temirlan.pulsewatch.enums.LogLevel;
 
-@Entity
-public class LogEntry {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public class LogIngestionRequest {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Enumerated(EnumType.STRING)
+    @NotNull
     private LogLevel level;
-
+    
+    @NotBlank
     private String message;
 
+    @NotBlank
     private String service;
 
+    @NotNull
     private Long timestamp;
-
-    public Long getId() {
-        return id;
-    }
 
     public LogLevel getLevel() {
         return level;
@@ -60,4 +50,5 @@ public class LogEntry {
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
+
 }
