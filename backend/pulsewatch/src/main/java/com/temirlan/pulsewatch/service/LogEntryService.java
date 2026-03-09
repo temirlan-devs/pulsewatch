@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import com.temirlan.pulsewatch.dto.LogIngestionRequest;
 import com.temirlan.pulsewatch.model.LogEntry;
 import com.temirlan.pulsewatch.repository.LogEntryRepository;
+import com.temirlan.pulsewatch.dto.LogResponse;
 
 @Service
 public class LogEntryService {
@@ -26,20 +27,32 @@ public class LogEntryService {
     //return logEntryRepository.save(log);
    }
 
-   public LogEntry saveLog(LogIngestionRequest request) {
+   private LogResponse mapToLogResponse(LogEntry logEntry) {
+      return new LogResponse(
+         logEntry.getId(),
+         logEntry.getLevel(),
+         logEntry.getMessage(),
+         logEntry.getService(),
+         logEntry.getTimestamp()
+      );
+   }
+
+   public LogResponse saveLog(LogIngestionRequest request) {
       LogEntry logEntry = new LogEntry();
       logEntry.setLevel(request.getLevel());
       logEntry.setMessage(request.getMessage());
       logEntry.setService(request.getService());
       logEntry.setTimestamp(request.getTimestamp());
-    return logEntryRepository.save(logEntry);
+
+      LogEntry savedLog = logEntryRepository.save(logEntry);
+      return mapToLogResponse(savedLog);
    }
 
-   public Page<LogEntry> getLogs(Pageable pageable) {
-      return logEntryRepository.findAll(pageable);
+   public Page<LogResponse> getLogs(Pageable pageable) {
+      return logEntryRepository.findAll(pageable).map(this::mapToLogResponse);
    }
 
-   public Page<LogEntry> getLogsByService(String service, Pageable pageable) {
-      return logEntryRepository.findByService(service, pageable);
+   public Page<LogResponse> getLogsByService(String service, Pageable pageable) {
+      return logEntryRepository.findByService(service, pageable).map(this::mapToLogResponse);
    }
 }
