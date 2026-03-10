@@ -1,0 +1,48 @@
+package com.temirlan.pulsewatch.controller;
+
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
+
+import com.temirlan.pulsewatch.dto.MetricIngestionRequest;
+import com.temirlan.pulsewatch.dto.MetricResponse;
+import com.temirlan.pulsewatch.dto.PagedMetricResponse;
+import com.temirlan.pulsewatch.model.MetricEntry;
+import com.temirlan.pulsewatch.service.MetricEntryService;
+
+@RestController
+@RequestMapping("/metrics")
+public class MetricIngestionController {
+
+    private final MetricEntryService metricEntryService;
+
+    public MetricIngestionController(MetricEntryService metricEntryService) {
+        this.metricEntryService = metricEntryService;
+    }
+
+    @PostMapping
+    public MetricResponse ingestMetric(@Valid @RequestBody MetricIngestionRequest request) {
+        MetricEntry entry = new MetricEntry();
+        entry.setService(request.getService());
+        entry.setRequestCount(request.getRequestCount());
+        entry.setErrorCount(request.getErrorCount());
+        entry.setAverageLatency(request.getAverageLatency());
+        entry.setTimestamp(request.getTimestamp());
+
+        return metricEntryService.saveMetric(entry);
+    }
+
+    @GetMapping
+    public PagedMetricResponse getMetrics(
+        @RequestParam(required = false) String service,
+        @RequestParam(required = false) Long from,
+        @RequestParam(required = false) Long to,
+        Pageable pageable
+    ) {
+        if (pageable.getPageSize() > 100) {
+            pageable = Pageable.ofSize(100).withPage(pageable.getPageNumber());
+        }
+
+        return metricEntryService.getMetrics(service, from, to, pageable);
+    }
+}
