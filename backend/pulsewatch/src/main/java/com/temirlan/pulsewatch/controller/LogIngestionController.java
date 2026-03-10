@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import com.temirlan.pulsewatch.dto.LogIngestionRequest;
 import com.temirlan.pulsewatch.service.LogEntryService;
 import com.temirlan.pulsewatch.dto.LogResponse;
+import com.temirlan.pulsewatch.dto.PagedLogResponse;
 
 @RestController
 @RequestMapping("/logs")
@@ -25,7 +26,7 @@ public class LogIngestionController {
     }
 
     @GetMapping
-    public Page<LogResponse> getLogs(
+    public PagedLogResponse getLogs(
         @RequestParam(required = false) String service, 
         @RequestParam(required = false) Long from,
         @RequestParam(required = false) Long to,
