@@ -48,11 +48,47 @@ public class LogEntryService {
       return mapToLogResponse(savedLog);
    }
 
+   public Page<LogResponse> getLogs(String service, Long from, Long to, Pageable pageable) {
+        boolean hasService = service != null && !service.isBlank();
+        boolean hasFrom = from != null;
+        boolean hasTo = to != null;
+
+        if (hasService && hasFrom && hasTo) {
+            return getLogsByServiceAndTimestamp(service, from, to, pageable);
+        }
+
+        if (hasFrom && hasTo) {
+            return getLogsByTimeStamp(from, to, pageable);
+        }
+
+        if (hasService) {
+            return getLogsByService(service, pageable);
+        }
+
+        return getLogs(pageable);
+   }
+
    public Page<LogResponse> getLogs(Pageable pageable) {
-      return logEntryRepository.findAll(pageable).map(this::mapToLogResponse);
+      return logEntryRepository
+               .findAll(pageable)
+               .map(this::mapToLogResponse);
    }
 
    public Page<LogResponse> getLogsByService(String service, Pageable pageable) {
-      return logEntryRepository.findByService(service, pageable).map(this::mapToLogResponse);
+      return logEntryRepository
+               .findByService(service, pageable)
+               .map(this::mapToLogResponse);
+   }
+
+   public Page<LogResponse> getLogsByTimeStamp(Long from, Long to, Pageable pageable) {
+      return logEntryRepository
+               .findByTimestampBetween(from, to, pageable)
+               .map(this::mapToLogResponse);
+   }
+
+   public Page<LogResponse> getLogsByServiceAndTimestamp(String service, Long from, Long to, Pageable pageable) {
+      return logEntryRepository
+               .findByServiceAndTimestampBetween(service, from, to, pageable)
+               .map(this::mapToLogResponse);
    }
 }

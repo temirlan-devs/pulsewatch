@@ -10,4 +10,7 @@ public interface LogEntryRepository extends JpaRepository<LogEntry, Long> {
     
     Page<LogEntry> findByService(String service, Pageable pageable);
 
+    Page<LogEntry> findByTimestampBetween(Long from, Long to, Pageable pageable);
+
+    Page<LogEntry> findByServiceAndTimestampBetween(String service, Long from, Long to, Pageable pageable);
 }

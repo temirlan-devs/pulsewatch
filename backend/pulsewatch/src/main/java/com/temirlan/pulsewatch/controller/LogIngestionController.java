@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.temirlan.pulsewatch.dto.LogIngestionRequest;
 import com.temirlan.pulsewatch.service.LogEntryService;
@@ -13,7 +12,7 @@ import com.temirlan.pulsewatch.dto.LogResponse;
 @RestController
 @RequestMapping("/logs")
 public class LogIngestionController {
-    
+
     private final LogEntryService logEntryService;
 
     public LogIngestionController(LogEntryService logEntryService) {
@@ -26,17 +25,17 @@ public class LogIngestionController {
     }
 
     @GetMapping
-    public Page<LogResponse> getLogs(@RequestParam(required = false) String service, Pageable pageable) {
-        
-        if(pageable.getPageSize() > 100) {
+    public Page<LogResponse> getLogs(
+        @RequestParam(required = false) String service, 
+        @RequestParam(required = false) Long from,
+        @RequestParam(required = false) Long to,
+        Pageable pageable
+    ) {
+        if (pageable.getPageSize() > 100) {
             pageable = Pageable.ofSize(100).withPage(pageable.getPageNumber());
         }
-
-        if (service != null && !service.isBlank()) {
-            return logEntryService.getLogsByService(service, pageable);
-        }
         
-        return logEntryService.getLogs(pageable);
+        return logEntryService.getLogs(service, from, to, pageable);
     }
 
 }
