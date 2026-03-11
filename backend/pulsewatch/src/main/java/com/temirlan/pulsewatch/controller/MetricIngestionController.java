@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.temirlan.pulsewatch.dto.MetricIngestionRequest;
 import com.temirlan.pulsewatch.dto.MetricResponse;
+import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.PagedMetricResponse;
 import com.temirlan.pulsewatch.model.MetricEntry;
 import com.temirlan.pulsewatch.service.MetricEntryService;
@@ -44,5 +45,14 @@ public class MetricIngestionController {
         }
 
         return metricEntryService.getMetrics(service, from, to, pageable);
+    }
+
+    @GetMapping("/summary")
+    public MetricsSummaryResponse getSummary(
+        @RequestParam String service,
+        @RequestParam long from,
+        @RequestParam long to
+    ) {
+        return metricEntryService.getSummary(service, from, to);
     }
 }

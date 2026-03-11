@@ -1,6 +1,8 @@
 package com.temirlan.pulsewatch.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,4 +16,5 @@ public interface MetricEntryRepository extends JpaRepository<MetricEntry, Long> 
 
     Page<MetricEntry> findByServiceAndTimestampBetween(String service, Long from, Long to, Pageable pageable);
 
+    List<MetricEntry> findByServiceAndTimestampBetween(String service, Long from, Long to);
 }
