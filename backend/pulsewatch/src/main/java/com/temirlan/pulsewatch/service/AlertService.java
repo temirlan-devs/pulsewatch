@@ -48,6 +48,13 @@ public class AlertService {
         createAlert(service, status, reason);
     }
 
+    public List<AlertResponse> getAlertByService(String service) {
+        return alertEntryRepository.findByService(service)
+                .stream()
+                .map(this::mapToAlertResponse)
+                .toList();
+    }
+
     public List<AlertResponse> getAllAlerts() {
         return alertEntryRepository.findAll()
                 .stream()

@@ -3,6 +3,7 @@ package com.temirlan.pulsewatch.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.temirlan.pulsewatch.dto.AlertResponse;
@@ -18,8 +19,14 @@ public class AlertController {
     }
 
     @GetMapping("/alerts")
-    public List<AlertResponse> getAllAlerts() {
+    public List<AlertResponse> getAllAlerts(@RequestParam(required = false) String service) {
+
+        if (service != null && !service.isBlank()) {
+            return alertService.getAlertByService(service);
+        }
+
         return alertService.getAllAlerts();
     }
+
 
 }
