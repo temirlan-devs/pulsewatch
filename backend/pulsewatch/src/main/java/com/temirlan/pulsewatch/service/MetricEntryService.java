@@ -2,6 +2,9 @@ package com.temirlan.pulsewatch.service;
 
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -18,22 +21,32 @@ import com.temirlan.pulsewatch.dto.PagedMetricResponse;
 public class MetricEntryService {
 
     private final MetricEntryRepository metricEntryRepository;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public MetricEntryService(MetricEntryRepository metricEntryRepository) {
         this.metricEntryRepository = metricEntryRepository;
     }
 
     private MetricResponse mapToMetricResponse(MetricEntry entry) {
+
+        String readableTimestamp = Instant.ofEpochMilli(entry.getTimestamp())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(FORMATTER);
+
         return new MetricResponse(
                 entry.getId(),
                 entry.getService(),
                 entry.getRequestCount(),
                 entry.getErrorCount(),
                 entry.getAverageLatency(),
-                entry.getTimestamp());
+                entry.getTimestamp(),
+                readableTimestamp
+            );
     }
 
     private PagedMetricResponse mapToPagedMetricResponse(Page<MetricResponse> page) {
+
         return new PagedMetricResponse(
                 page.getContent(),
                 page.getNumber(),

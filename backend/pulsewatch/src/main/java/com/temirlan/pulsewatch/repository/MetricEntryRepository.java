@@ -19,4 +19,6 @@ public interface MetricEntryRepository extends JpaRepository<MetricEntry, Long> 
     List<MetricEntry> findByServiceAndTimestampBetween(String service, Long from, Long to);
 
     Optional<MetricEntry> findTopByServiceOrderByTimestampDesc(String service);
+
+    List<MetricEntry> findDistinctByOrderByServiceAsc();
 }

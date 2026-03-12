@@ -7,14 +7,16 @@ public class MetricResponse {
     private Long errorCount;
     private Double averageLatency;
     private Long timestamp;
+    private String timestampReadable;
 
-    public MetricResponse(Long id, String service, Long requestCount, Long errorCount, Double averageLatency, Long timestamp) {
+    public MetricResponse(Long id, String service, Long requestCount, Long errorCount, Double averageLatency, Long timestamp, String timestampReadable) {
         this.id = id;
         this.service = service;
         this.requestCount = requestCount;
         this.errorCount = errorCount;
         this.averageLatency = averageLatency;
         this.timestamp = timestamp;
+        this.timestampReadable = timestampReadable;
     }
 
     public Long getId() {
@@ -39,5 +41,9 @@ public class MetricResponse {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public String getTimestampReadable() {
+        return timestampReadable;
     }
 }
