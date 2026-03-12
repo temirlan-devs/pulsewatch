@@ -8,7 +8,6 @@ import com.temirlan.pulsewatch.dto.MetricIngestionRequest;
 import com.temirlan.pulsewatch.dto.MetricResponse;
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.PagedMetricResponse;
-import com.temirlan.pulsewatch.model.MetricEntry;
 import com.temirlan.pulsewatch.service.MetricEntryService;
 
 @RestController
@@ -23,14 +22,7 @@ public class MetricIngestionController {
 
     @PostMapping
     public MetricResponse ingestMetric(@Valid @RequestBody MetricIngestionRequest request) {
-        MetricEntry entry = new MetricEntry();
-        entry.setService(request.getService());
-        entry.setRequestCount(request.getRequestCount());
-        entry.setErrorCount(request.getErrorCount());
-        entry.setAverageLatency(request.getAverageLatency());
-        entry.setTimestamp(request.getTimestamp());
-
-        return metricEntryService.saveMetric(entry);
+        return metricEntryService.saveMetric(request);
     }
 
     @GetMapping

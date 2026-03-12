@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.temirlan.pulsewatch.model.MetricEntry;
 import com.temirlan.pulsewatch.repository.MetricEntryRepository;
+import com.temirlan.pulsewatch.dto.MetricIngestionRequest;
 import com.temirlan.pulsewatch.dto.MetricResponse;
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.PagedMetricResponse;
@@ -42,7 +43,14 @@ public class MetricEntryService {
                 page.isLast());
     }
 
-    public MetricResponse saveMetric(MetricEntry entry) {
+    public MetricResponse saveMetric(MetricIngestionRequest request) {
+        MetricEntry entry = new MetricEntry();
+        entry.setService(request.getService());
+        entry.setRequestCount(request.getRequestCount());
+        entry.setErrorCount(request.getErrorCount());
+        entry.setAverageLatency(request.getAverageLatency());
+        entry.setTimestamp(request.getTimestamp());
+
         MetricEntry saved = metricEntryRepository.save(entry);
         return mapToMetricResponse(saved);
     }

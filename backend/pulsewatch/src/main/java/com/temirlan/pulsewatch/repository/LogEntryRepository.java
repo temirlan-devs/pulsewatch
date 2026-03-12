@@ -1,6 +1,7 @@
 package com.temirlan.pulsewatch.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,4 +14,7 @@ public interface LogEntryRepository extends JpaRepository<LogEntry, Long> {
     Page<LogEntry> findByTimestampBetween(Long from, Long to, Pageable pageable);
 
     Page<LogEntry> findByServiceAndTimestampBetween(String service, Long from, Long to, Pageable pageable);
+
+    Optional<LogEntry> findTopByServiceOrderByTimestampDesc(String service);
+
 }
