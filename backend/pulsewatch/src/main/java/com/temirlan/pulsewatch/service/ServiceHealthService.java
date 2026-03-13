@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.ServiceHealthResponse;
+import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.repository.LogEntryRepository;
 import com.temirlan.pulsewatch.repository.MetricEntryRepository;
 
@@ -43,7 +44,7 @@ public class ServiceHealthService {
         String reason = null;
         if("ERROR".equals(status)) {
             reason = "Error rate exceeded 5%";
-            alertService.createAlertIfStatusChanged(service, status, reason);
+            alertService.createAlertIfStatusChanged(service, AlertType.HEALTH, status, reason);
         }
 
         return new ServiceHealthResponse(service, status, errorRate, averageLatency, lastMetricTimestamp, lastLogTimestamp);

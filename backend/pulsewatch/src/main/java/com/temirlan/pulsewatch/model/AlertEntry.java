@@ -1,6 +1,10 @@
 package com.temirlan.pulsewatch.model;
 
+import com.temirlan.pulsewatch.enums.AlertType;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,9 +17,12 @@ public class AlertEntry {
     private Long id;
 
     private String service;
+    @Enumerated(EnumType.STRING)
+    private AlertType type;
     private String status;
     private String reason;
     private Long timestamp;
+
 
     public Long getId() {
         return id;
@@ -27,6 +34,14 @@ public class AlertEntry {
 
     public void setService(String service) {
         this.service = service;
+    }
+
+    public AlertType getType() {
+        return type;
+    }
+
+    public void setType(AlertType type) {
+        this.type = type;
     }
 
     public String getStatus() {
@@ -52,4 +67,5 @@ public class AlertEntry {
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
+
 }

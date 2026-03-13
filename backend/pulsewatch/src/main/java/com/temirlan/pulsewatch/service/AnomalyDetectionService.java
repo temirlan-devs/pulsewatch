@@ -6,10 +6,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.geo.Metric;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.model.MetricEntry;
 import com.temirlan.pulsewatch.repository.MetricEntryRepository;
 
@@ -84,7 +84,7 @@ public class AnomalyDetectionService {
         System.out.println("Current error rate: " + currentErrorRate);
         System.out.println("Baseline error rate: " + baselineErrorRate);
         if (currentErrorRate > baselineErrorRate * 3) {
-            alertService.createAlertIfStatusChanged(service, "WARN", "Anomalous error rate spike detected");
+            alertService.createAlertIfStatusChanged(service, AlertType.ANOMALY, "WARN", "Anomalous error rate spike detected");
         }
         System.out.println();
     }
@@ -100,8 +100,6 @@ public class AnomalyDetectionService {
         for(String service : services) {
             detectServiceAnomaly(service);
         }
-
-        //System.out.println("Processing...");
     }
 
     private String formatTimestamp(long ts) {
