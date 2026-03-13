@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.temirlan.pulsewatch.dto.AlertResponse;
+import com.temirlan.pulsewatch.dto.AlertStatsResponse;
 import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.service.AlertService;
 
@@ -24,6 +25,16 @@ public class AlertController {
     @PostMapping("/alerts/{id}/acknowledge")
     public AlertResponse acknowledgeAlert(@PathVariable Long id) {
         return alertService.acknowledgeAlert(id);
+    }
+
+    @PostMapping("/alerts/{id}/resolve")
+    public AlertResponse resolveAlert(@PathVariable Long id) {
+        return alertService.resolveAlert(id);
+    }
+
+    @GetMapping("/alerts/stats")
+    public AlertStatsResponse getAlertStats() {
+        return alertService.getAlertsStats();
     }
 
     @GetMapping("/alerts")

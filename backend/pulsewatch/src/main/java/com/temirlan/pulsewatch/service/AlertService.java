@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.AlertResponse;
+import com.temirlan.pulsewatch.dto.AlertStatsResponse;
 import com.temirlan.pulsewatch.enums.AlertStatus;
 import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.model.AlertEntry;
@@ -74,6 +75,45 @@ public class AlertService {
         AlertEntry saved = alertEntryRepository.save(alert);
 
         return mapToAlertResponse(saved);
+    }
+
+    public AlertResponse resolveAlert(Long id) {
+        AlertEntry alert = alertEntryRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        alert.setAlertStatus(AlertStatus.RESOLVED);
+
+        AlertEntry saved = alertEntryRepository.save(alert);
+
+        return mapToAlertResponse(saved);
+    }
+
+    public AlertStatsResponse getAlertsStats() {
+        List<AlertEntry> alerts = alertEntryRepository.findAll();
+
+        long totalAlerts = alerts.size();
+
+        long openAlerts = alerts.stream()
+                .filter(alert -> alert.getAlertStatus() == AlertStatus.OPEN)
+                .count();
+
+        long acknowledgedAlerts = alerts.stream()
+                .filter(alert -> alert.getAlertStatus() == AlertStatus.ACKNOWLEDGED)
+                .count();
+
+        long resolvedAlerts = alerts.stream()
+                .filter(alert -> alert.getAlertStatus() == AlertStatus.RESOLVED)
+                .count();
+
+        long healthAlerts = alerts.stream()
+                .filter(alert -> alert.getType() == AlertType.HEALTH)
+                .count();
+
+        long anomalyAlerts = alerts.stream()
+                .filter(alert -> alert.getType() == AlertType.ANOMALY)
+                .count();
+
+        return new AlertStatsResponse(totalAlerts, openAlerts, acknowledgedAlerts, resolvedAlerts, healthAlerts, anomalyAlerts);
     }
 
     public List<AlertResponse> getAlerts(String service, AlertType type, String status, Long from, Long to) {
