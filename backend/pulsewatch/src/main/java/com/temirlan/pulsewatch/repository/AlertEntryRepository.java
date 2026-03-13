@@ -14,5 +14,7 @@ public interface AlertEntryRepository extends JpaRepository<AlertEntry, Long> {
     List<AlertEntry> findByService(String service);
     
     Optional<AlertEntry> findTopByServiceAndTypeAndStatusOrderByTimestampDesc(String service, AlertType type, String status);
+
+    List<AlertEntry> findByType(AlertType type);
     
 }

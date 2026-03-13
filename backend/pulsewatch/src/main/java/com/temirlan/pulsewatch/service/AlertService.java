@@ -67,6 +67,13 @@ public class AlertService {
                 .toList();
     }
 
+    public List<AlertResponse> getAlertsByType(AlertType type) {
+        return alertEntryRepository.findByType(type)
+                .stream()
+                .map(this::mapToAlertResponse)
+                .toList();
+    }
+
     public List<AlertResponse> getAllAlerts() {
         return alertEntryRepository.findAll()
                 .stream()
