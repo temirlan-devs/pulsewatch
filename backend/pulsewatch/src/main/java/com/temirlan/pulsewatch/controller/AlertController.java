@@ -3,6 +3,8 @@ package com.temirlan.pulsewatch.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,21 +21,20 @@ public class AlertController {
         this.alertService = alertService;
     }
 
+    @PostMapping("/alerts/{id}/acknowledge")
+    public AlertResponse acknowledgeAlert(@PathVariable Long id) {
+        return alertService.acknowledgeAlert(id);
+    }
+
     @GetMapping("/alerts")
     public List<AlertResponse> getAllAlerts(
             @RequestParam(required = false) String service,
-            @RequestParam(required = false) AlertType type
+            @RequestParam(required = false) AlertType type,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long from,
+            @RequestParam(required = false) Long to
     ) {
-
-        if (service != null && !service.isBlank()) {
-            return alertService.getAlertByService(service);
-        }
-
-        if (type != null) {
-            return alertService.getAlertsByType(type);
-        }
-
-        return alertService.getAllAlerts();
+        return alertService.getAlerts(service, type, status, from, to);
     }
 
 

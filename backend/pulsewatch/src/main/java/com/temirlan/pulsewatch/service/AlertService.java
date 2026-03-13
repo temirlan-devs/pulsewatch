@@ -3,12 +3,15 @@ package com.temirlan.pulsewatch.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.AlertResponse;
+import com.temirlan.pulsewatch.enums.AlertStatus;
 import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.model.AlertEntry;
 import com.temirlan.pulsewatch.repository.AlertEntryRepository;
+import com.temirlan.pulsewatch.repository.AlertEntrySpecification;
 
 @Service
 public class AlertService {
@@ -26,7 +29,8 @@ public class AlertService {
             entry.getType(),
             entry.getStatus(), 
             entry.getReason(), 
-            entry.getTimestamp()
+            entry.getTimestamp(),
+            entry.getAlertStatus()
         );
     }
 
@@ -38,6 +42,7 @@ public class AlertService {
         alertEntry.setStatus(status);
         alertEntry.setReason(reason);
         alertEntry.setTimestamp(System.currentTimeMillis());
+        alertEntry.setAlertStatus(AlertStatus.OPEN);
         
         return alertEntryRepository.save(alertEntry);
     }
@@ -60,24 +65,24 @@ public class AlertService {
         createAlert(service, type, status, reason);
     }
 
-    public List<AlertResponse> getAlertByService(String service) {
-        return alertEntryRepository.findByService(service)
+    public AlertResponse acknowledgeAlert(Long id) {
+        AlertEntry alert = alertEntryRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        alert.setAlertStatus(AlertStatus.ACKNOWLEDGED);
+
+        AlertEntry saved = alertEntryRepository.save(alert);
+
+        return mapToAlertResponse(saved);
+    }
+
+    public List<AlertResponse> getAlerts(String service, AlertType type, String status, Long from, Long to) {
+        Specification<AlertEntry> spec = AlertEntrySpecification.withFilters(service, type, status, from, to);
+
+        return alertEntryRepository.findAll(spec)
                 .stream()
                 .map(this::mapToAlertResponse)
                 .toList();
     }
 
-    public List<AlertResponse> getAlertsByType(AlertType type) {
-        return alertEntryRepository.findByType(type)
-                .stream()
-                .map(this::mapToAlertResponse)
-                .toList();
-    }
-
-    public List<AlertResponse> getAllAlerts() {
-        return alertEntryRepository.findAll()
-                .stream()
-                .map(this::mapToAlertResponse)
-                .toList();
-    }
 }

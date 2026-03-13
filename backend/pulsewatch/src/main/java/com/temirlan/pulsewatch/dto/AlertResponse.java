@@ -1,5 +1,6 @@
 package com.temirlan.pulsewatch.dto;
 
+import com.temirlan.pulsewatch.enums.AlertStatus;
 import com.temirlan.pulsewatch.enums.AlertType;
 
 public class AlertResponse {
@@ -10,14 +11,16 @@ public class AlertResponse {
     private String status;
     private String reason;
     private Long timestamp;
+    private AlertStatus alertStatus;
 
-    public AlertResponse(Long id, String service, AlertType type, String status, String reason, Long timestamp) {
+    public AlertResponse(Long id, String service, AlertType type, String status, String reason, Long timestamp, AlertStatus alertStatus) {
         this.id = id;
         this.service = service;
         this.type = type;
         this.status = status;
         this.reason = reason;
         this.timestamp = timestamp;
+        this.alertStatus = alertStatus;
     }
 
     public Long getId() {
@@ -42,6 +45,14 @@ public class AlertResponse {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public AlertStatus getAlertStatus() {
+        return alertStatus;
+    }
+
+    public void setAlertStatus(AlertStatus alertStatus) {
+        this.alertStatus = alertStatus;
     }
 
 }
