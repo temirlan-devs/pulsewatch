@@ -73,14 +73,8 @@ public class ServiceHealthService {
             alertService.createAlertIfStatusChanged(service, AlertType.HEALTH, status, reason);
         }
 
-        long openAlerts = alertEntryRepository.findAll().stream()
-                .filter(alert -> service.equals(alert.getService()))
-                .filter(alert -> alert.getAlertStatus() == AlertStatus.OPEN)
-                .count();
-        long acknowledgedAlerts = alertEntryRepository.findAll().stream()
-                .filter(alert -> service.equals(service))
-                .filter(alert -> alert.getAlertStatus() == AlertStatus.ACKNOWLEDGED)
-                .count();
+        long openAlerts = alertEntryRepository.countByServiceAndAlertStatus(service, AlertStatus.OPEN);
+        long acknowledgedAlerts = alertEntryRepository.countByServiceAndAlertStatus(service, AlertStatus.ACKNOWLEDGED);
 
         return new ServiceHealthResponse(service, status, errorRate, averageLatency, lastMetricTimestamp, lastLogTimestamp, openAlerts, acknowledgedAlerts);
         

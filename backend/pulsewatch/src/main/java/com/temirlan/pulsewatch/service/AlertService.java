@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.temirlan.pulsewatch.dto.AlertResponse;
 import com.temirlan.pulsewatch.dto.AlertStatsResponse;
 import com.temirlan.pulsewatch.dto.PagedAlertResponse;
+import com.temirlan.pulsewatch.enums.AlertSeverity;
 import com.temirlan.pulsewatch.enums.AlertStatus;
 import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.model.AlertEntry;
@@ -46,7 +47,8 @@ public class AlertService {
             entry.getStatus(), 
             entry.getReason(), 
             entry.getTimestamp(),
-            entry.getAlertStatus()
+            entry.getAlertStatus(),
+            entry.getAlertSeverity()
         );
     }
 
@@ -59,6 +61,18 @@ public class AlertService {
         alertEntry.setReason(reason);
         alertEntry.setTimestamp(System.currentTimeMillis());
         alertEntry.setAlertStatus(AlertStatus.OPEN);
+
+        AlertSeverity severity;
+
+        if ("ERROR".equals(status)) {
+            severity = AlertSeverity.CRITICAL;
+        } else if ("WARN".equals(status)) {
+            severity = AlertSeverity.WARNING;
+        } else {
+            severity = AlertSeverity.INFO;
+        }
+
+        alertEntry.setAlertSeverity(severity);
         
         return alertEntryRepository.save(alertEntry);
     }
@@ -108,25 +122,12 @@ public class AlertService {
 
         long totalAlerts = alerts.size();
 
-        long openAlerts = alerts.stream()
-                .filter(alert -> alert.getAlertStatus() == AlertStatus.OPEN)
-                .count();
+        long openAlerts = alertEntryRepository.countByAlertStatus(AlertStatus.OPEN);
+        long acknowledgedAlerts = alertEntryRepository.countByAlertStatus(AlertStatus.ACKNOWLEDGED);
+        long resolvedAlerts = alertEntryRepository.countByAlertStatus(AlertStatus.RESOLVED);
 
-        long acknowledgedAlerts = alerts.stream()
-                .filter(alert -> alert.getAlertStatus() == AlertStatus.ACKNOWLEDGED)
-                .count();
-
-        long resolvedAlerts = alerts.stream()
-                .filter(alert -> alert.getAlertStatus() == AlertStatus.RESOLVED)
-                .count();
-
-        long healthAlerts = alerts.stream()
-                .filter(alert -> alert.getType() == AlertType.HEALTH)
-                .count();
-
-        long anomalyAlerts = alerts.stream()
-                .filter(alert -> alert.getType() == AlertType.ANOMALY)
-                .count();
+        long healthAlerts = alertEntryRepository.countByType(AlertType.HEALTH);
+        long anomalyAlerts = alertEntryRepository.countByType(AlertType.ANOMALY);
 
         return new AlertStatsResponse(totalAlerts, openAlerts, acknowledgedAlerts, resolvedAlerts, healthAlerts, anomalyAlerts);
     }

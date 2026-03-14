@@ -1,5 +1,6 @@
 package com.temirlan.pulsewatch.model;
 
+import com.temirlan.pulsewatch.enums.AlertSeverity;
 import com.temirlan.pulsewatch.enums.AlertStatus;
 import com.temirlan.pulsewatch.enums.AlertType;
 
@@ -25,6 +26,8 @@ public class AlertEntry {
     private Long timestamp;
     @Enumerated(EnumType.STRING)
     private AlertStatus alertStatus;
+    @Enumerated(EnumType.STRING)
+    private AlertSeverity alertSeverity;
 
 
     public Long getId() {
@@ -79,4 +82,11 @@ public class AlertEntry {
         this.alertStatus = alertStatus;
     }
 
+    public AlertSeverity getAlertSeverity() {
+        return alertSeverity;
+    }
+
+    public void setAlertSeverity(AlertSeverity alertSeverity) {
+        this.alertSeverity = alertSeverity;
+    }
 }
