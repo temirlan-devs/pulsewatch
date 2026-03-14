@@ -1,6 +1,5 @@
 package com.temirlan.pulsewatch.controller;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;

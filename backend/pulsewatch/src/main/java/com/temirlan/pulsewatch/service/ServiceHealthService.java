@@ -12,6 +12,7 @@ import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.ServiceHealthResponse;
 import com.temirlan.pulsewatch.enums.AlertStatus;
 import com.temirlan.pulsewatch.enums.AlertType;
+import com.temirlan.pulsewatch.enums.ServiceStatus;
 import com.temirlan.pulsewatch.repository.AlertEntryRepository;
 import com.temirlan.pulsewatch.repository.LogEntryRepository;
 import com.temirlan.pulsewatch.repository.MetricEntryRepository;
@@ -36,7 +37,7 @@ public class ServiceHealthService {
         this.alertService = alertService;
     }
 
-    public String determineStatus(long lastMetricTimestamp, long lastLogTimestamp, double errorRate,
+    public ServiceStatus determineStatus(long lastMetricTimestamp, long lastLogTimestamp, double errorRate,
             double averageLatency) {
         long now = System.currentTimeMillis();
         long freshnessThresholdMs = 5 * 60 * 1000;
@@ -45,18 +46,18 @@ public class ServiceHealthService {
         boolean staleMetrics = lastMetricTimestamp == 0 || (now - lastMetricTimestamp > freshnessThresholdMs);
 
         if (noData || staleMetrics) {
-            return "NO_DATA";
+            return ServiceStatus.NO_DATA;
         }
 
         if (errorRate > 0.05) {
-            return "ERROR";
+            return ServiceStatus.ERROR;
         }
 
         if (averageLatency > 500 || errorRate > 0.01) {
-            return "WARN";
+            return ServiceStatus.WARN;
         }
 
-        return "OK";
+        return ServiceStatus.OK;
     }
 
     public List<ServiceHealthResponse> sortServicesByPriority(List<ServiceHealthResponse> services) {
@@ -64,9 +65,9 @@ public class ServiceHealthService {
                 .sorted(
                         Comparator
                                 .comparingInt((ServiceHealthResponse r) -> switch (r.getStatus()) {
-                                    case "ERROR" -> 0;
-                                    case "WARN" -> 1;
-                                    case "NO_DATA" -> 2;
+                                    case ERROR -> 0;
+                                    case WARN -> 1;
+                                    case NO_DATA -> 2;
                                     default -> 3;
                                 })
                                 .thenComparing(ServiceHealthResponse::getOpenAlerts, Comparator.reverseOrder())
@@ -104,12 +105,12 @@ public class ServiceHealthService {
         double errorRate = summary.errorRate();
         double averageLatency = summary.averageLatency();
 
-        String status = determineStatus(lastMetricTimestamp, lastLogTimestamp, errorRate, averageLatency);
+        ServiceStatus status = determineStatus(lastMetricTimestamp, lastLogTimestamp, errorRate, averageLatency);
 
         String reason = null;
-        if ("ERROR".equals(status)) {
+        if (status == ServiceStatus.ERROR) {
             reason = "Error rate exceeded 5%";
-            alertService.createAlertIfStatusChanged(service, AlertType.HEALTH, status, reason);
+            alertService.createAlertIfStatusChanged(service, AlertType.HEALTH, status.name(), reason);
         }
 
         long openAlerts = alertEntryRepository.countByServiceAndAlertStatus(service, AlertStatus.OPEN);

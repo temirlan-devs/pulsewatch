@@ -1,9 +1,11 @@
 package com.temirlan.pulsewatch.dto;
 
+import com.temirlan.pulsewatch.enums.ServiceStatus;
+
 public class ServiceHealthResponse {
     
     public String service;
-    public String status;
+    public ServiceStatus status;
 
     private double errorRate;
     private double averageLatency;
@@ -16,7 +18,7 @@ public class ServiceHealthResponse {
     private long openAlerts;
     private long acknowledgedAlerts;
 
-    public ServiceHealthResponse(String service, String status, double errorRate, double averageLatency, long lastMetricTimestamp, long lastLogTimestamp, String lastMetricTimestampReadable, String lastLogTimestampReadable, long openAlerts, long acknowledgedAlerts) {
+    public ServiceHealthResponse(String service, ServiceStatus status, double errorRate, double averageLatency, long lastMetricTimestamp, long lastLogTimestamp, String lastMetricTimestampReadable, String lastLogTimestampReadable, long openAlerts, long acknowledgedAlerts) {
         this.service = service;
         this.status = status;
         this.errorRate = errorRate;
@@ -33,7 +35,7 @@ public class ServiceHealthResponse {
         return service;
     }
 
-    public String getStatus() {
+    public ServiceStatus getStatus() {
         return status;
     }
 
