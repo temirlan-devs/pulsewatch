@@ -2,7 +2,6 @@ package com.temirlan.pulsewatch.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.temirlan.pulsewatch.dto.LogIngestionRequest;
