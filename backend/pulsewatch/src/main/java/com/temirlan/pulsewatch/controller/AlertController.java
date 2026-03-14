@@ -2,6 +2,8 @@ package com.temirlan.pulsewatch.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.temirlan.pulsewatch.dto.AlertResponse;
 import com.temirlan.pulsewatch.dto.AlertStatsResponse;
+import com.temirlan.pulsewatch.dto.PagedAlertResponse;
 import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.service.AlertService;
 
@@ -38,14 +41,19 @@ public class AlertController {
     }
 
     @GetMapping("/alerts")
-    public List<AlertResponse> getAllAlerts(
+    public PagedAlertResponse getAlerts(
             @RequestParam(required = false) String service,
             @RequestParam(required = false) AlertType type,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long from,
-            @RequestParam(required = false) Long to
+            @RequestParam(required = false) Long to,
+            Pageable pageable
     ) {
-        return alertService.getAlerts(service, type, status, from, to);
+        if(pageable.getPageSize() > 100) {
+            pageable = Pageable.ofSize(100).withPage(pageable.getPageNumber());
+        }
+
+        return alertService.getAlerts(service, type, status, from, to, pageable);
     }
 
 

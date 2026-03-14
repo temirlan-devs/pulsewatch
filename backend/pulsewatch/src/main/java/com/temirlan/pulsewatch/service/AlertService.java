@@ -3,11 +3,15 @@ package com.temirlan.pulsewatch.service;
 import java.util.List;
 import java.util.Optional;
 
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.AlertResponse;
 import com.temirlan.pulsewatch.dto.AlertStatsResponse;
+import com.temirlan.pulsewatch.dto.PagedAlertResponse;
 import com.temirlan.pulsewatch.enums.AlertStatus;
 import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.model.AlertEntry;
@@ -21,6 +25,17 @@ public class AlertService {
 
     public AlertService(AlertEntryRepository alertEntryRepository) {
         this.alertEntryRepository = alertEntryRepository;
+    }
+
+    private PagedAlertResponse mapToPagedAlertResponse(Page<AlertResponse> page) {
+        return new PagedAlertResponse(
+            page.getContent(),
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalElements(),
+            page.getTotalPages(),
+            page.isLast()
+        );
     }
 
     private AlertResponse mapToAlertResponse(AlertEntry entry) {
@@ -116,13 +131,14 @@ public class AlertService {
         return new AlertStatsResponse(totalAlerts, openAlerts, acknowledgedAlerts, resolvedAlerts, healthAlerts, anomalyAlerts);
     }
 
-    public List<AlertResponse> getAlerts(String service, AlertType type, String status, Long from, Long to) {
+    public PagedAlertResponse getAlerts(String service, AlertType type, String status, Long from, Long to, Pageable pageable) {
         Specification<AlertEntry> spec = AlertEntrySpecification.withFilters(service, type, status, from, to);
 
-        return alertEntryRepository.findAll(spec)
-                .stream()
-                .map(this::mapToAlertResponse)
-                .toList();
+        Page<AlertResponse> page = alertEntryRepository
+                .findAll(spec, pageable)
+                .map(this::mapToAlertResponse);
+
+        return mapToPagedAlertResponse(page);
     }
 
 }

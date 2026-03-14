@@ -27,6 +27,17 @@ public class MetricEntryService {
         this.metricEntryRepository = metricEntryRepository;
     }
 
+    private PagedMetricResponse mapToPagedMetricResponse(Page<MetricResponse> page) {
+
+        return new PagedMetricResponse(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast());
+    }
+
     private MetricResponse mapToMetricResponse(MetricEntry entry) {
 
         String readableTimestamp = Instant.ofEpochMilli(entry.getTimestamp())
@@ -43,17 +54,6 @@ public class MetricEntryService {
                 entry.getTimestamp(),
                 readableTimestamp
             );
-    }
-
-    private PagedMetricResponse mapToPagedMetricResponse(Page<MetricResponse> page) {
-
-        return new PagedMetricResponse(
-                page.getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isLast());
     }
 
     public MetricResponse saveMetric(MetricIngestionRequest request) {
