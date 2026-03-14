@@ -1,6 +1,11 @@
 package com.temirlan.pulsewatch.service;
 
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,6 +18,8 @@ import com.temirlan.pulsewatch.dto.PagedLogResponse;
 @Service
 public class LogEntryService {
    private final LogEntryRepository logEntryRepository;
+   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 
    public LogEntryService(LogEntryRepository logEntryRepository) {
       this.logEntryRepository = logEntryRepository;
@@ -29,12 +36,19 @@ public class LogEntryService {
    }
 
    private LogResponse mapToLogResponse(LogEntry logEntry) {
+      String readable = Instant.ofEpochMilli(logEntry.getTimestamp())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(FORMATTER);
+
       return new LogResponse(
             logEntry.getId(),
             logEntry.getLevel(),
             logEntry.getMessage(),
             logEntry.getService(),
-            logEntry.getTimestamp());
+            logEntry.getTimestamp(),
+            readable
+         );
    }
 
    private PagedLogResponse mapToPagedLogResponse(Page<LogResponse> page) {

@@ -8,13 +8,15 @@ public class LogResponse {
     private String message;
     private String service;
     private Long timestamp;
+    private String timestampReadable;
 
-    public LogResponse(Long id, LogLevel level, String message, String service, Long timestamp) {
+    public LogResponse(Long id, LogLevel level, String message, String service, Long timestamp, String timestampReadable) {
         this.id = id;
         this.level = level;
         this.message = message;
         this.service = service;
         this.timestamp = timestamp;
+        this.timestampReadable = timestampReadable;
     }
 
     public Long getId() {
@@ -35,5 +37,9 @@ public class LogResponse {
     
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public String getTimestampReadable() {
+        return timestampReadable;
     }
 }

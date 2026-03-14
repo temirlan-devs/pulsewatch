@@ -7,5 +7,7 @@ public record MetricsSummaryResponse(
     double errorRate,
     double averageLatency,
     long fromTimestamp,
-    long toTimestamp
+    long toTimestamp,
+    String fromTimestampReadable,
+    String toTimestampReadable
 ) {}

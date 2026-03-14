@@ -1,5 +1,9 @@
 package com.temirlan.pulsewatch.service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
@@ -18,6 +22,7 @@ public class ServiceHealthService {
     private final AlertEntryRepository alertEntryRepository;
     private final MetricEntryService metricEntryService;
     private final AlertService alertService;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public ServiceHealthService(MetricEntryRepository metricEntryRepository, LogEntryRepository logEntryRepository, AlertEntryRepository alertEntryRepository, MetricEntryService metricEntryService, AlertService alertService) {
         this.metricEntryRepository = metricEntryRepository;
@@ -60,6 +65,20 @@ public class ServiceHealthService {
             .map(l -> l.getTimestamp())
             .orElse(0L);
 
+        String lastMetricTimestampReadable = lastMetricTimestamp == 0
+                ? null
+                : Instant.ofEpochMilli(lastMetricTimestamp)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime()
+                        .format(FORMATTER);
+
+        String lastLogTimestampReadable = lastLogTimestamp == 0
+                ? null
+                : Instant.ofEpochMilli(lastLogTimestamp)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime()
+                        .format(FORMATTER);
+
         MetricsSummaryResponse summary = metricEntryService.getSummary(service, 0L, System.currentTimeMillis());
 
         double errorRate = summary.errorRate();
@@ -76,7 +95,7 @@ public class ServiceHealthService {
         long openAlerts = alertEntryRepository.countByServiceAndAlertStatus(service, AlertStatus.OPEN);
         long acknowledgedAlerts = alertEntryRepository.countByServiceAndAlertStatus(service, AlertStatus.ACKNOWLEDGED);
 
-        return new ServiceHealthResponse(service, status, errorRate, averageLatency, lastMetricTimestamp, lastLogTimestamp, openAlerts, acknowledgedAlerts);
+        return new ServiceHealthResponse(service, status, errorRate, averageLatency, lastMetricTimestamp, lastLogTimestamp, lastMetricTimestampReadable, lastLogTimestampReadable, openAlerts, acknowledgedAlerts);
         
     }
 

@@ -27,7 +27,7 @@ public class AlertEntry {
     @Enumerated(EnumType.STRING)
     private AlertStatus alertStatus;
     @Enumerated(EnumType.STRING)
-    private AlertSeverity alertSeverity;
+    private AlertSeverity severity;
 
 
     public Long getId() {
@@ -83,10 +83,10 @@ public class AlertEntry {
     }
 
     public AlertSeverity getAlertSeverity() {
-        return alertSeverity;
+        return severity;
     }
 
     public void setAlertSeverity(AlertSeverity alertSeverity) {
-        this.alertSeverity = alertSeverity;
+        this.severity = alertSeverity;
     }
 }

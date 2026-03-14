@@ -12,16 +12,18 @@ public class AlertResponse {
     private String status;
     private String reason;
     private Long timestamp;
+    private String timestampReadable;
     private AlertStatus alertStatus;
     private AlertSeverity alertSeverity;
 
-    public AlertResponse(Long id, String service, AlertType type, String status, String reason, Long timestamp, AlertStatus alertStatus, AlertSeverity alertSeverity) {
+    public AlertResponse(Long id, String service, AlertType type, String status, String reason, Long timestamp, String timestampReadable, AlertStatus alertStatus, AlertSeverity alertSeverity) {
         this.id = id;
         this.service = service;
         this.type = type;
         this.status = status;
         this.reason = reason;
         this.timestamp = timestamp;
+        this.timestampReadable = timestampReadable;
         this.alertStatus = alertStatus;
         this.alertSeverity = alertSeverity;
     }
@@ -48,6 +50,10 @@ public class AlertResponse {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public String getTimestampReadable() {
+        return timestampReadable;
     }
 
     public AlertStatus getAlertStatus() {

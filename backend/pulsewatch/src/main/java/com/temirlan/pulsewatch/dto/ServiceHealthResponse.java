@@ -10,17 +10,21 @@ public class ServiceHealthResponse {
 
     private long lastMetricTimestamp;
     private long lastLogTimestamp;
+    private String lastMetricTimestampReadable;
+    private String lastLogTimestampReadable;
 
     private long openAlerts;
     private long acknowledgedAlerts;
 
-    public ServiceHealthResponse(String service, String status, double errorRate, double averageLatency, long lastMetricTimestamp, long lastLogTimestamp, long openAlerts, long acknowledgedAlerts) {
+    public ServiceHealthResponse(String service, String status, double errorRate, double averageLatency, long lastMetricTimestamp, long lastLogTimestamp, String lastMetricTimestampReadable, String lastLogTimestampReadable, long openAlerts, long acknowledgedAlerts) {
         this.service = service;
         this.status = status;
         this.errorRate = errorRate;
         this.averageLatency = averageLatency;
         this.lastMetricTimestamp = lastMetricTimestamp;
         this.lastLogTimestamp = lastLogTimestamp;
+        this.lastMetricTimestampReadable = lastMetricTimestampReadable;
+        this.lastLogTimestampReadable = lastLogTimestampReadable;
         this.openAlerts = openAlerts;
         this.acknowledgedAlerts = acknowledgedAlerts;
     }
@@ -47,6 +51,14 @@ public class ServiceHealthResponse {
 
     public long getLastLogTimestamp() {
         return lastLogTimestamp;
+    }
+
+    public String getLastMetricTimestampReadable() {
+        return lastMetricTimestampReadable;
+    }
+
+    public String getLastLogTimestampReadable() {
+        return lastLogTimestampReadable;
     }
 
     public long getOpenAlerts() {

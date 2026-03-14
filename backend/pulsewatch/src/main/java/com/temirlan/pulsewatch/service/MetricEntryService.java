@@ -131,6 +131,17 @@ public class MetricEntryService {
         List<MetricEntry> entries = metricEntryRepository
                 .findByServiceAndTimestampBetween(service, from, to);
 
+        String fromTimestampReadable = Instant.ofEpochMilli(from)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(FORMATTER);
+
+        String toTimestampReadable = Instant.ofEpochMilli(to)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(FORMATTER);
+
+
         if (entries.isEmpty()) {
             return new MetricsSummaryResponse(
                     service,
@@ -139,7 +150,10 @@ public class MetricEntryService {
                     0.0,
                     0.0,
                     from,
-                    to);
+                    to,
+                    fromTimestampReadable,
+                    toTimestampReadable
+            );
         }
 
         long totalRequests = entries.stream()
@@ -166,7 +180,9 @@ public class MetricEntryService {
                 errorRate,
                 averageLatency,
                 from,
-                to
+                to,
+                fromTimestampReadable,
+                toTimestampReadable
         );
 
     }

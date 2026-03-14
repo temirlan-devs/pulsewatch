@@ -1,9 +1,12 @@
 package com.temirlan.pulsewatch.service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,7 +25,12 @@ import com.temirlan.pulsewatch.repository.AlertEntrySpecification;
 @Service
 public class AlertService {
     private final AlertEntryRepository alertEntryRepository;
-    private static final long ALERT_COOLDOWN_MS = 10 * 60 * 1000;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+
+    @Value("${pulsewatch.alert.cooldown-ms}")
+    private long alertCooldownMs;
+
 
     public AlertService(AlertEntryRepository alertEntryRepository) {
         this.alertEntryRepository = alertEntryRepository;
@@ -40,6 +48,11 @@ public class AlertService {
     }
 
     private AlertResponse mapToAlertResponse(AlertEntry entry) {
+        String readable = Instant.ofEpochMilli(entry.getTimestamp())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(FORMATTER);
+
         return new AlertResponse(
             entry.getId(), 
             entry.getService(), 
@@ -47,6 +60,7 @@ public class AlertService {
             entry.getStatus(), 
             entry.getReason(), 
             entry.getTimestamp(),
+            readable,
             entry.getAlertStatus(),
             entry.getAlertSeverity()
         );
@@ -85,7 +99,7 @@ public class AlertService {
 
             boolean sameType = type.equals(alert.getType());
             boolean sameStatus = status.equals(alert.getStatus());
-            boolean withinCooldown = (System.currentTimeMillis() - alert.getTimestamp() < ALERT_COOLDOWN_MS);
+            boolean withinCooldown = (System.currentTimeMillis() - alert.getTimestamp() < alertCooldownMs);
 
             if (sameType && sameStatus && withinCooldown) {
                 return;
@@ -132,8 +146,8 @@ public class AlertService {
         return new AlertStatsResponse(totalAlerts, openAlerts, acknowledgedAlerts, resolvedAlerts, healthAlerts, anomalyAlerts);
     }
 
-    public PagedAlertResponse getAlerts(String service, AlertType type, String status, Long from, Long to, Pageable pageable) {
-        Specification<AlertEntry> spec = AlertEntrySpecification.withFilters(service, type, status, from, to);
+    public PagedAlertResponse getAlerts(String service, AlertType type, String status, AlertSeverity severity, Long from, Long to, Pageable pageable) {
+        Specification<AlertEntry> spec = AlertEntrySpecification.withFilters(service, type, status, severity, from, to);
 
         Page<AlertResponse> page = alertEntryRepository
                 .findAll(spec, pageable)
