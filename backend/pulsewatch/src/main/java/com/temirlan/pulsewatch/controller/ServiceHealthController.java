@@ -1,5 +1,6 @@
 package com.temirlan.pulsewatch.controller;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,10 +32,12 @@ public class ServiceHealthController {
     public List<ServiceHealthResponse> getAllServicesHealth() {
         ServicesResponse servicesResponse = metricEntryService.getServices();
 
-        return servicesResponse.getServices()
+        List<ServiceHealthResponse> services = servicesResponse.getServices()
                 .stream()
                 .map(serviceHealthService::getServiceHealth)
                 .toList();
+
+        return serviceHealthService.sortServicesByPriority(services);              
     }
 
 }

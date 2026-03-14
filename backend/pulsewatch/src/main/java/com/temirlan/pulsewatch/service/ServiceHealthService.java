@@ -3,6 +3,8 @@ package com.temirlan.pulsewatch.service;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,7 @@ import com.temirlan.pulsewatch.repository.MetricEntryRepository;
 
 @Service
 public class ServiceHealthService {
-    
+
     private final MetricEntryRepository metricEntryRepository;
     private final LogEntryRepository logEntryRepository;
     private final AlertEntryRepository alertEntryRepository;
@@ -24,7 +26,9 @@ public class ServiceHealthService {
     private final AlertService alertService;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public ServiceHealthService(MetricEntryRepository metricEntryRepository, LogEntryRepository logEntryRepository, AlertEntryRepository alertEntryRepository, MetricEntryService metricEntryService, AlertService alertService) {
+    public ServiceHealthService(MetricEntryRepository metricEntryRepository, LogEntryRepository logEntryRepository,
+            AlertEntryRepository alertEntryRepository, MetricEntryService metricEntryService,
+            AlertService alertService) {
         this.metricEntryRepository = metricEntryRepository;
         this.logEntryRepository = logEntryRepository;
         this.alertEntryRepository = alertEntryRepository;
@@ -32,7 +36,8 @@ public class ServiceHealthService {
         this.alertService = alertService;
     }
 
-    public String determineStatus(long lastMetricTimestamp, long lastLogTimestamp, double errorRate, double averageLatency) {
+    public String determineStatus(long lastMetricTimestamp, long lastLogTimestamp, double errorRate,
+            double averageLatency) {
         long now = System.currentTimeMillis();
         long freshnessThresholdMs = 5 * 60 * 1000;
 
@@ -54,16 +59,31 @@ public class ServiceHealthService {
         return "OK";
     }
 
+    public List<ServiceHealthResponse> sortServicesByPriority(List<ServiceHealthResponse> services) {
+        return services.stream()
+                .sorted(
+                        Comparator
+                                .comparingInt((ServiceHealthResponse r) -> switch (r.getStatus()) {
+                                    case "ERROR" -> 0;
+                                    case "WARN" -> 1;
+                                    case "NO_DATA" -> 2;
+                                    default -> 3;
+                                })
+                                .thenComparing(ServiceHealthResponse::getOpenAlerts, Comparator.reverseOrder())
+                                .thenComparing(ServiceHealthResponse::getErrorRate, Comparator.reverseOrder()))
+                .toList();
+    }
+
     public ServiceHealthResponse getServiceHealth(String service) {
         long lastMetricTimestamp = metricEntryRepository
-            .findTopByServiceOrderByTimestampDesc(service)
-            .map(m -> m.getTimestamp())
-            .orElse(0L);
+                .findTopByServiceOrderByTimestampDesc(service)
+                .map(m -> m.getTimestamp())
+                .orElse(0L);
 
         long lastLogTimestamp = logEntryRepository
-            .findTopByServiceOrderByTimestampDesc(service)
-            .map(l -> l.getTimestamp())
-            .orElse(0L);
+                .findTopByServiceOrderByTimestampDesc(service)
+                .map(l -> l.getTimestamp())
+                .orElse(0L);
 
         String lastMetricTimestampReadable = lastMetricTimestamp == 0
                 ? null
@@ -87,7 +107,7 @@ public class ServiceHealthService {
         String status = determineStatus(lastMetricTimestamp, lastLogTimestamp, errorRate, averageLatency);
 
         String reason = null;
-        if("ERROR".equals(status)) {
+        if ("ERROR".equals(status)) {
             reason = "Error rate exceeded 5%";
             alertService.createAlertIfStatusChanged(service, AlertType.HEALTH, status, reason);
         }
@@ -95,8 +115,10 @@ public class ServiceHealthService {
         long openAlerts = alertEntryRepository.countByServiceAndAlertStatus(service, AlertStatus.OPEN);
         long acknowledgedAlerts = alertEntryRepository.countByServiceAndAlertStatus(service, AlertStatus.ACKNOWLEDGED);
 
-        return new ServiceHealthResponse(service, status, errorRate, averageLatency, lastMetricTimestamp, lastLogTimestamp, lastMetricTimestampReadable, lastLogTimestampReadable, openAlerts, acknowledgedAlerts);
-        
+        return new ServiceHealthResponse(service, status, errorRate, averageLatency, lastMetricTimestamp,
+                lastLogTimestamp, lastMetricTimestampReadable, lastLogTimestampReadable, openAlerts,
+                acknowledgedAlerts);
+
     }
 
 }
