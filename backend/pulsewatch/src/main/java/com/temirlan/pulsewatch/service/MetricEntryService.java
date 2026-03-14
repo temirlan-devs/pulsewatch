@@ -16,6 +16,7 @@ import com.temirlan.pulsewatch.dto.MetricIngestionRequest;
 import com.temirlan.pulsewatch.dto.MetricResponse;
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.PagedMetricResponse;
+import com.temirlan.pulsewatch.dto.ServicesResponse;
 
 @Service
 public class MetricEntryService {
@@ -66,6 +67,12 @@ public class MetricEntryService {
 
         MetricEntry saved = metricEntryRepository.save(entry);
         return mapToMetricResponse(saved);
+    }
+
+    public ServicesResponse getServices() {
+        List<String> services = metricEntryRepository.findDistinctServices();
+
+        return new ServicesResponse(services);
     }
 
     public Page<MetricResponse> getAllMetrics(Pageable pageable) {

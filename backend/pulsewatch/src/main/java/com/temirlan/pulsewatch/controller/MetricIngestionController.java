@@ -8,6 +8,7 @@ import com.temirlan.pulsewatch.dto.MetricIngestionRequest;
 import com.temirlan.pulsewatch.dto.MetricResponse;
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.PagedMetricResponse;
+import com.temirlan.pulsewatch.dto.ServicesResponse;
 import com.temirlan.pulsewatch.service.MetricEntryService;
 
 @RestController
@@ -46,5 +47,10 @@ public class MetricIngestionController {
         @RequestParam long to
     ) {
         return metricEntryService.getSummary(service, from, to);
+    }
+
+    @GetMapping("/services")
+    public ServicesResponse getServices() {
+        return metricEntryService.getServices();
     }
 }
