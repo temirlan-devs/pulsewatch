@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.temirlan.pulsewatch.dto.ServicePredictionResponse;
+import com.temirlan.pulsewatch.dto.ServiceRiskRankingResponse;
 import com.temirlan.pulsewatch.service.ServicePredictionService;
 
 @RestController
@@ -26,6 +27,11 @@ public class ServicePredictionController {
     @GetMapping("/services/predictions")
     public List<ServicePredictionResponse> getAllServicePredictions() {
         return servicePredictionService.predictAllServices();
+    }
+
+    @GetMapping("services/risk-ranking")
+    public List<ServiceRiskRankingResponse> getServiceRiskRanking() {
+        return servicePredictionService.getRiskRanking();
     }
 
 }

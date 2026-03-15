@@ -1,12 +1,14 @@
 package com.temirlan.pulsewatch.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.ServiceHealthResponse;
 import com.temirlan.pulsewatch.dto.ServicePredictionResponse;
+import com.temirlan.pulsewatch.dto.ServiceRiskRankingResponse;
 import com.temirlan.pulsewatch.dto.ServicesResponse;
 
 @Service
@@ -71,6 +73,20 @@ public class ServicePredictionService {
         return servicesResponse.getServices()
                 .stream()
                 .map(this::predictServiceRisk)
+                .toList();
+    }
+
+    public List<ServiceRiskRankingResponse> getRiskRanking() {
+        List<ServicePredictionResponse> predictions = predictAllServices();
+
+        return predictions.stream()
+                .sorted(Comparator.comparingDouble(ServicePredictionResponse::getRiskScore).reversed())
+                .map(p -> new ServiceRiskRankingResponse(
+                    p.getService(),
+                    p.getRiskScore(),
+                    p.getPredictedStatus(),
+                    p.getConfidence()
+                ))
                 .toList();
     }
 
