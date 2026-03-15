@@ -5,7 +5,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -13,7 +12,6 @@ import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.model.MetricEntry;
 import com.temirlan.pulsewatch.repository.MetricEntryRepository;
 
-@SpringBootApplication
 @EnableScheduling
 public class AnomalyDetectionService {
     
