@@ -168,3 +168,39 @@ GET /alerts?status=OPEN
 ```
 
 ---
+
+## Technology Stack
+
+- Java
+- Spring Boot
+- Spring Data JPA
+- PostgreSQL
+- REST APIs
+
+---
+
+## Project Goals
+Pulsewatch demonstrates:
+
+- backend system design
+- monitoring architecture
+- anomaly detection logic
+- operational insights generation
+
+---
+
+## Future Improvements
+
+Possible extensions:
+
+- real ML anomaly detection
+- streaming ingestion
+- distributed metrics pipeline
+- dashboard visualization
+- LLM-generated operational summaries
+
+---
+
+## System Architecture
+
+![PulseWatch Architecture](docs/architecture.svg)
