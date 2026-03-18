@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
@@ -25,6 +26,8 @@ public class ServiceHealthService {
     private final AlertEntryRepository alertEntryRepository;
     private final MetricEntryService metricEntryService;
     private final AlertService alertService;
+    @Value("${pulsewatch.freshness-threshold-minutes}")
+    private long freshnessThresholdMinutes;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public ServiceHealthService(MetricEntryRepository metricEntryRepository, LogEntryRepository logEntryRepository,
@@ -40,7 +43,7 @@ public class ServiceHealthService {
     public ServiceStatus determineStatus(long lastMetricTimestamp, long lastLogTimestamp, double errorRate,
             double averageLatency) {
         long now = System.currentTimeMillis();
-        long freshnessThresholdMs = 5 * 60 * 1000;
+        long freshnessThresholdMs = freshnessThresholdMinutes * 60 * 1000;
 
         boolean noData = lastMetricTimestamp == 0 && lastLogTimestamp == 0;
         boolean staleMetrics = lastMetricTimestamp == 0 || (now - lastMetricTimestamp > freshnessThresholdMs);
