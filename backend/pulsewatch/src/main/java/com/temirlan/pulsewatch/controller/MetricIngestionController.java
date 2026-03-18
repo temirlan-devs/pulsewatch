@@ -2,6 +2,11 @@ package com.temirlan.pulsewatch.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.data.domain.Pageable;
 
 import com.temirlan.pulsewatch.dto.MetricIngestionRequest;
@@ -9,6 +14,8 @@ import com.temirlan.pulsewatch.dto.MetricResponse;
 import com.temirlan.pulsewatch.dto.MetricsSummaryResponse;
 import com.temirlan.pulsewatch.dto.PagedMetricResponse;
 import com.temirlan.pulsewatch.dto.ServicesResponse;
+import com.temirlan.pulsewatch.queue.MetricQueue;
+import com.temirlan.pulsewatch.queue.QueuedMetricRequest;
 import com.temirlan.pulsewatch.service.MetricEntryService;
 
 @RestController
@@ -16,6 +23,7 @@ import com.temirlan.pulsewatch.service.MetricEntryService;
 public class MetricIngestionController {
 
     private final MetricEntryService metricEntryService;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public MetricIngestionController(MetricEntryService metricEntryService) {
         this.metricEntryService = metricEntryService;
@@ -23,16 +31,27 @@ public class MetricIngestionController {
 
     @PostMapping
     public MetricResponse ingestMetric(@Valid @RequestBody MetricIngestionRequest request) {
-        return metricEntryService.saveMetric(request);
+        MetricQueue.QUEUE.offer(new QueuedMetricRequest(request, 0));
+
+        return new MetricResponse(
+                null,
+                request.getService(),
+                request.getRequestCount(),
+                request.getErrorCount(),
+                request.getAverageLatency(),
+                request.getTimestamp(),
+                Instant.ofEpochMilli(request.getTimestamp())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime()
+                        .format(FORMATTER));
     }
 
     @GetMapping
     public PagedMetricResponse getMetrics(
-        @RequestParam(required = false) String service,
-        @RequestParam(required = false) Long from,
-        @RequestParam(required = false) Long to,
-        Pageable pageable
-    ) {
+            @RequestParam(required = false) String service,
+            @RequestParam(required = false) Long from,
+            @RequestParam(required = false) Long to,
+            Pageable pageable) {
         if (pageable.getPageSize() > 100) {
             pageable = Pageable.ofSize(100).withPage(pageable.getPageNumber());
         }
@@ -42,10 +61,9 @@ public class MetricIngestionController {
 
     @GetMapping("/summary")
     public MetricsSummaryResponse getSummary(
-        @RequestParam String service,
-        @RequestParam long from,
-        @RequestParam long to
-    ) {
+            @RequestParam String service,
+            @RequestParam long from,
+            @RequestParam long to) {
         return metricEntryService.getSummary(service, from, to);
     }
 
