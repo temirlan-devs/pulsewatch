@@ -2,14 +2,14 @@ package com.temirlan.pulsewatch.service;
 
 import java.util.List;
 
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import com.temirlan.pulsewatch.dto.MetricWindowAnalysisResponse;
 import com.temirlan.pulsewatch.enums.AlertType;
 import com.temirlan.pulsewatch.repository.MetricEntryRepository;
 
-@EnableScheduling
+@Service
 public class AnomalyDetectionService {
     
     private final MetricEntryRepository metricEntryRepository;
@@ -66,7 +66,7 @@ public class AnomalyDetectionService {
             .map(metric -> metric.getService())
             .distinct()
             .toList();
-
+        System.out.println("Running anomaly detection for services: " + services);
         for(String service : services) {
             detectServiceAnomaly(service);
         }

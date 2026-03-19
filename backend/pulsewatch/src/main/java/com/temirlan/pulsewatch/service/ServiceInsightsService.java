@@ -38,7 +38,7 @@ public class ServiceInsightsService {
         ServicePredictionResponse prediction = servicePredictionService.predictServiceRisk(service);
 
         long now = System.currentTimeMillis();
-        long logWindowMs = freshnessThresholdMinutes * logWindowMultipler * 60 * 100;
+        long logWindowMs = freshnessThresholdMinutes * logWindowMultipler * 60 * 1000;
         long from = now - logWindowMs;
 
         List<LogEntry> recentLogs = logEntryRepository
