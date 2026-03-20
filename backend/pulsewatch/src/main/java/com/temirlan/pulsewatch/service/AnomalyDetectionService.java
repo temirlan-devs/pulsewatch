@@ -66,7 +66,6 @@ public class AnomalyDetectionService {
             .map(metric -> metric.getService())
             .distinct()
             .toList();
-        System.out.println("Running anomaly detection for services: " + services);
         for(String service : services) {
             detectServiceAnomaly(service);
         }

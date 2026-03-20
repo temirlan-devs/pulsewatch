@@ -17,13 +17,11 @@ public class SystemOverviewService {
     private final MetricEntryService metricEntryService;
     private final ServiceHealthService serviceHealthService;
     private final ServicePredictionService servicePredictionService;
-    private final AlertService alertService;
 
-    public SystemOverviewService (MetricEntryService metricEntryService, ServiceHealthService serviceHealthService, ServicePredictionService servicePredictionService, AlertService alertService) {
+    public SystemOverviewService (MetricEntryService metricEntryService, ServiceHealthService serviceHealthService, ServicePredictionService servicePredictionService) {
         this.metricEntryService = metricEntryService;
         this.serviceHealthService = serviceHealthService;
         this.servicePredictionService = servicePredictionService;
-        this.alertService = alertService;
     }
 
     public SystemOverviewResponse getSystemOverview() {

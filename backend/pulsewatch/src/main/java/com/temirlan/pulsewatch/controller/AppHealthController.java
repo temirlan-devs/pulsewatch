@@ -5,15 +5,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HealthController {
+public class AppHealthController {
     
     private final LogEntryService logEntryService;
 
-    public HealthController(LogEntryService logEntryService) {
+    public AppHealthController(LogEntryService logEntryService) {
         this.logEntryService = logEntryService;
     }
 
-    @GetMapping("/health")
+    @GetMapping("/app-health")
     public String health() {
 
         logEntryService.createHealthLog();
