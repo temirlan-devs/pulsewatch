@@ -105,6 +105,16 @@ Metrics are processed via an **internal queue with retry handling**, enabling:
 
 ---
 
+### Scheduled Traffic Simulation
+PulseWatch includes a built-in simulators that generates realistic service traffic for multiple services.
+
+The simulator:
+- continuous metric ingestion
+- automatic anomaly injection
+- log event simulation
+
+This allows the system to operate as a live monitoring environment without manual data input.
+
 ### Configurable Monitoring Behavior
 System thresholds and analysis windows are configurable via `application.properties`, including:
 
