@@ -2,29 +2,28 @@
 
 **PulseWatch** is a backend platform for **real-time system monitoring, anomaly detection, and operational insights**.
 
-It ingests service metrics and logs, evaluates service health, detects anomalies, generates alerts, and produces risk-based insights about system behavior.
+It ingests service metrics and logs, evaluates service health, detects anomalies, manages alerts, and generates **risk-based predictions and explainable insights** about system behavior.
 
-The project demonstrates how a production-style monitoring backend can be designed using **clean architecture, structured APIs, and explainable intelligence layers**.
+The project demonstrates how a **production-grade monitoring backend** can be designed using clean architecture, structured APIs, and layered intelligence components.
 
 ---
 
-# Key Features
+## Key Features
 
-## Real-time Monitoring
+### Real-time Monitoring
 PulseWatch ingests and stores operational metrics and logs from multiple services.
 
 Example metrics:
-- request count
-- error count
-- latency
+- request count  
+- error count  
+- latency  
 
 ---
 
-## Service Health Evaluation
+### Service Health Evaluation
 Each service health status is computed using monitoring signals.
 
 Possible states:
-
 - **OK** — service operating normally  
 - **WARN** — abnormal behavior detected  
 - **ERROR** — failure conditions detected  
@@ -32,50 +31,55 @@ Possible states:
 
 ---
 
-## Anomaly Detection
-PulseWatch continuously compares recent metrics against historical baselines.
+### Anomaly Detection
+PulseWatch compares recent metrics against historical baselines using a **window-based analysis approach**.
 
-The system detects anomalies such as:
-
+Detects:
 - sudden error rate spikes  
 - abnormal latency increases  
-- unusual request patterns  
+- unusual traffic patterns  
 
 ---
 
-## Alert Management System
-PulseWatch includes a full alert lifecycle:
+### Alert Management System
+Full alert lifecycle with state transitions:
 
-Alert states:
 - **OPEN**
 - **ACKNOWLEDGED**
 - **RESOLVED**
 
-Features include:
-- alert severity levels  
+Features:
+- severity levels  
 - cooldown windows  
 - deduplication logic  
 - service-level filtering  
 
 ---
 
-## Prediction & Risk Scoring
-PulseWatch computes operational risk scores based on service behavior.
+### Prediction & Risk Scoring
+PulseWatch computes **risk scores and predicted service states** based on:
 
-Predictions include:
+- anomaly signals  
+- service health  
+- active alerts  
+- metric trends  
 
+Outputs:
 - predicted service status  
-- risk score estimation  
-- anomaly indicators  
-
-This layer provides early signals of potential system instability.
+- risk score (0–1)  
+- confidence level  
+- reasoning signals  
 
 ---
 
-## AI-style Operational Insights 
-PulseWatch generates structured explanations for service behavior.
+### Insights Engine (Explainable Intelligence)
+Generates structured explanations by combining:
 
-Example insight output:
+- metric analysis  
+- alert state  
+- log signals  
+
+Example output:
 
 ```text
 Service: payment-service
@@ -92,81 +96,137 @@ Inspect downstream dependencies and recent deployment changes.
 
 ---
 
+### Asynchronous Metric Ingestion
+Metrics are processed via an **internal queue with retry handling**, enabling:
+
+- decoupled ingestion  
+- improved reliability  
+- backpressure handling  
+
+---
+
+### Configurable Monitoring Behavior
+System thresholds and analysis windows are configurable via `application.properties`, including:
+
+- freshness thresholds
+- alert cooldown windows
+- log analysis windows
+- log analysis limits
+- ingestion limits
+
+---
+
+### Interactive API Documentation (Swagger)
+PulseWatch provides interactive API documentation via Swagger (OpenAPI).
+
+Access after starting the app:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+You can:
+- explore endpoints  
+- execute requests  
+- inspect request/response formats  
+
+---
+
+### Test Coverage (Core Intelligence Layer)
+Unit tests cover key system logic:
+
+- metric window analysis  
+- service prediction engine  
+- insights generation  
+
+---
+
 ## Architecture
 
-PulseWatch follows a layered backend architecture:
+![PulseWatch Architecture](docs/architecture.svg)
 
+PulseWatch follows a layered architecture:
 ```text
 Controller Layer → Service Layer → Repository Layer → Database
 ```
 
-Core components include:
-
-- Metric ingestion  
-- Log ingestion  
-- Health evaluation  
-- Anomaly detection  
-- Alert system  
-- Prediction engine  
-- Insights engine  
-- System overview  
+Core components:
+- metric ingestion  
+- log ingestion  
+- health evaluation  
+- anomaly detection  
+- alert system  
+- prediction engine  
+- insights engine  
+- system overview  
 
 ---
 
-## Example API Endpoints
+## Data Flow
+
+1. Services send metrics and logs
+2. Metrics are queued and processed asynchronously
+3. Data is stored in PostgreSQL
+4. The system evaluates:
+    - service health
+    - anomaly detection
+    - alert generation
+5. The prediction engine calculates:
+    - risk score
+    - predicted status
+6. The insights engine generates:
+    - human-readable explanations
+7. Results are exposed through REST APIs and Swagger UI
+
+---
+
+## API Endpoints Overview
+
+### Health
+- `GET /health`
 
 ### Metrics
-Retrieve metrics for a service and time range:
+- `POST /metrics` (ingest metric)
+- `GET /metrics` (paged fetch; query params: service, from, to, page, size, sort)
+- `GET /metrics/summary?service=...&from=...&to=...`
+- `GET /metrics/services`
 
-```http
-GET /metrics?service=auth-service&from=...&to=...
-```
-
----
-
-### Metrics Summary
-Retrieve aggregated metrics statistics:
-
-```http
-GET /metrics/summary?service=auth-service&from=...&to=...
-```
-
----
+### Logs
+- `POST /logs` (ingest log)
+- `GET /logs` (paged fetch; query params: service, from, to, page, size, sort)
 
 ### Service Health
-Retrieve the current health status of a service:
-
-```http
-GET /services/{service}/health
-```
-
----
+- `GET /services/{service}/health`
+- `GET /services/health`
 
 ### Service Insights
-Retrieve operational explanation and recommended actions:
+- `GET /services/{service}/insights`
 
-```http
-GET /services/{service}/insights
-```
+### Service Prediction
+- `GET /services/{service}/prediction`
+- `GET /services/predictions`
+- `GET /services/risk-ranking`
 
----
+### System Overview
+- `GET /system/overview`
 
-### Alerts
-Retrieve alerts:
-
-```http
-GET /alerts
-```
-
-Filter alerts:
-
-```http
-GET /alerts?service=auth-service
-GET /alerts?severity=CRITICAL
-GET /alerts?status=OPEN
-```
+### Alert Management
+- `GET /alerts` (paged fetch; query params: service, type, status, severity, from, to, page, size, sort)
+- `GET /alerts/stats`
+- `POST /alerts/{id}/acknowledge`
+- `POST /alerts/{id}/resolve`
 
 ---
+
+## Components
+- Ingestion layer: `MetricIngestionController`, `LogIngestionController`, `MetricQueue` and queue retry handling
+- Health and anomaly engine: `ServiceHealthController`, `ServiceHealthService`, `MetricEntryService`
+- Prediction engine: `ServicePredictionController`, `ServicePredictionService`
+- Insights engine: `ServiceInsightsController`, `ServiceInsightsService`
+- Alert lifecycle: `AlertController`, `AlertService`, `AlertRepository`
+- System overview: `SystemOverviewController`, `SystemOverviewService`
+- Persistence layer: JPA repositories under `repository`, DTOs under `dto`
+- API docs: Swagger UI at `/swagger-ui/index.html`
 
 ## Technology Stack
 
@@ -175,43 +235,14 @@ GET /alerts?status=OPEN
 - Spring Data JPA  
 - PostgreSQL  
 - REST APIs  
-
----
-
-## Project Goals
-
-PulseWatch demonstrates:
-
-- backend system design  
-- monitoring architecture  
-- anomaly detection logic  
-- alert lifecycle management  
-- operational insights generation  
-
----
-
-## Future Improvements
-
-Possible extensions:
-
-- real ML anomaly detection  
-- streaming ingestion  
-- distributed metrics pipeline  
-- dashboard visualization  
-- LLM-generated operational summaries  
-
----
-
-## System Architecture
-
-![PulseWatch Architecture](docs/architecture.svg)
+- Maven  
+- Swagger (OpenAPI)  
 
 ---
 
 ## How to Run
 
 ### Prerequisites
-
 - Java 17+  
 - PostgreSQL  
 
@@ -240,7 +271,7 @@ spring.datasource.password=your_password
 
 ---
 
-### API Base URL
+## API Base URL
 
 ```text
 http://localhost:8080
@@ -248,7 +279,7 @@ http://localhost:8080
 
 ---
 
-## API Examples
+## Example Requests
 
 ### Create Metric
 
@@ -337,15 +368,79 @@ GET /services/auth-service/insights
 GET /alerts?service=auth-service&status=OPEN
 ```
 
+```http
+GET /alerts/stats
+```
+
+```http
+POST /alerts/{id}/acknowledge
+```
+
+```http
+POST /alerts/{id}/resolve
+```
+
 ```json
-[
-  {
-    "service": "auth-service",
-    "type": "ANOMALY",
-    "status": "OPEN",
-    "severity": "HIGH",
-    "message": "Error rate exceeded threshold",
-    "timestamp": 1772911425000
-  }
-]
+{
+  "service": "auth-service",
+  "type": "ANOMALY",
+  "status": "OPEN",
+  "severity": "HIGH",
+  "message": "Error rate exceeded threshold",
+  "timestamp": 1772911425000
+}
+```
+
+---
+
+### Logs
+
+```http
+POST /logs
+Content-Type: application/json
+```
+
+```json
+{
+  "level": "ERROR",
+  "message": "Database connection timeout",
+  "service": "auth-service",
+  "timestamp": 1772911425000
+}
+```
+
+```http
+GET /logs?service=auth-service&from=1772911000000&to=1772912000000
+```
+
+---
+
+### Service Health (all)
+
+```http
+GET /services/health
+```
+
+---
+
+### Service Prediction
+
+```http
+GET /services/auth-service/prediction
+```
+
+```http
+GET /services/predictions
+```
+
+```http
+GET /services/risk-ranking
+```
+
+---
+
+### System Overview
+
+```http
+GET /system/overview
 ```
